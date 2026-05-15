@@ -11,6 +11,11 @@ from mojo.UI import StatusInteractivePopUpWindow, GetFolder, OpenScriptWindow, g
 import subprocess
 from pprint import pprint
 
+from lib.UI import preferences
+from AppKit import NSApp, NSEventModifierFlagCommand, NSEventModifierFlagShift, NSEventModifierFlagOption, NSEventModifierFlagControl
+
+
+
 MODIFIER_MAP = {
 131072:  "shift",
 262144:  "control",
@@ -34,7 +39,7 @@ MODIFIER_SYMBOLS = {
 "command": "⌘",
 }
 
-class scriptLauncher(object):
+class RoboLauncher(object):
     def __init__(self):
 
         ## Preference Files
@@ -55,6 +60,7 @@ class scriptLauncher(object):
         self.rememberLast = 1
         self.searchLocal = False
         self.searchUpDir = 3
+        self.editor = "robofont"
         # Storage
         self.scripts = {"preferences": ("", "system"), "shortcuts": ("", "system")}
 
@@ -72,7 +78,7 @@ class scriptLauncher(object):
         self.w = StatusInteractivePopUpWindow((x, y, width, height), screen=screen)
 
         self.w.search_box = vanilla.EditText(
-            (10, 10, -10, 40), "", placeholder="Search...", callback=self.searchScripts
+            (10, 10, -10, 30), "", placeholder="Search...", callback=self.searchScripts
         )
 
         self.w.search_box.getNSTextField().setFont_(
@@ -83,7 +89,7 @@ class scriptLauncher(object):
         text_ns.setBordered_(False)
         text_ns.setFocusRingType_(1)
         text_ns.setCornerRadius_(7)
-        # ns.setBackgroundColor_(NSColor.clearColor())
+        text_ns.setBackgroundColor_(NSColor.clearColor())
 
         """using EditText because SearchBox overrides tab and Enter buttons"""
         self.w.list = vanilla.List(
@@ -185,6 +191,9 @@ class scriptLauncher(object):
 
             if "value" in config["SEARCHLOCAL"]:
                 self.searchLocal = int([config["SEARCHLOCAL"]["value"]][0])
+
+            if "textEditor" in config["EDITOR"]:
+                self.editor = str([config["EDITOR"]["textEditor"]][0]).lower()
 
             if "searchUpDir" in config["SEARCHLOCAL"]:
                 self.searchUpDir = int([config["SEARCHLOCAL"]["searchUpDir"]][0])
@@ -424,16 +433,32 @@ class scriptLauncher(object):
                 print("Error. Script will not run. %s" % (e))
         self.lastScriptWrite(sender, file)
 
+
+
+    def get_keyboard_equivalent(self, menu_item):
+        key_equivalent = menu_item.keyEquivalent()
+        modifier_mask = menu_item.keyEquivalentModifierMask()
+        modifiers = []
+        if modifier_mask & NSEventModifierFlagCommand:
+            modifiers.append(MODIFIER_SYMBOLS["command"])
+        if modifier_mask & NSEventModifierFlagShift:
+            modifiers.append(MODIFIER_SYMBOLS["shift"])
+        if modifier_mask & NSEventModifierFlagOption:
+            modifiers.append(MODIFIER_SYMBOLS["option"])
+        if modifier_mask & NSEventModifierFlagControl:
+            modifiers.append(MODIFIER_SYMBOLS["control"])
+        return f"{' + '.join(modifiers)} + {key_equivalent}" if key_equivalent else None
+
     def pullShortcuts(self):
         shorts = dict(getDefault("menuShortCuts", {}))
         shortcuts = []
-        for name, keys in shorts.items():
-            m,k = keys
-            if m in MODIFIER_MAP:
-                conv = ' + '.join([MODIFIER_SYMBOLS[i.strip()] for i in MODIFIER_MAP[m].split("+")])
-                conv += f" + {k}"
-            formatted = {"name": name, "desc": conv}
-            shortcuts.append(formatted)
+        ### frank
+        for item, menu_item in preferences.preferencesMenuShortCuts.getShortCuts().items():
+            shortcut = self.get_keyboard_equivalent(menu_item)
+            if shortcut:
+                #print(item, "\t", shortcut)
+                formatted = {"name": item, "desc": shortcut}
+                shortcuts.append(formatted)
         self.w.list.set(shortcuts)
 
     def runScript(self, sender):
@@ -454,6 +479,7 @@ class scriptLauncher(object):
                     else:
                         self.executeScript(script_path, sender)
 
+
     def openScriptInScriptingWindow(self, sender):
         if self.w.list.getSelection():
             if self.w.list.get()[self.w.list.getSelection()[0]]["name"] not in ["preferences", "shortcuts"]:
@@ -463,12 +489,14 @@ class scriptLauncher(object):
                 if not os.path.exists(script_path):
                     print("script not found at path:", script_path)
                 else:
-                    subprocess.call(("open", script_path))
-                    # OpenScriptWindow(script_path)
+                    if self.editor == "external":
+                        subprocess.call(("open", script_path))
+                    else:
+                        OpenScriptWindow(script_path)
 
     def closeWindow(self, sender):
         self.w.close()
 
 
 if __name__ == "__main__":
-    scriptLauncher()
+    RoboLauncher()
