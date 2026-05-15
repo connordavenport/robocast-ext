@@ -1,9 +1,9 @@
-RoboLauncher
+Robocast
 ==============
 
-RoboLauncher is a tool to quickly find and run commands and scripts. Similar to [Raycast](https://www.raycast.com) or OSX's Spotlight Search.
+Robocast is a tool to quickly find and run commands and scripts. Similar to [Raycast](https://www.raycast.com) or OSX's Spotlight Search.
 Based on a fork of Mark Record's `ScriptLauncher`.
-The RoboLauncher is more focused on being an all-around RoboFont command palette.
+The Robocast is more focused on being an all-around RoboFont command palette.
 
 Usage:
 ------
@@ -29,7 +29,7 @@ This is a read-only function to let you see all the shortcuts being used.
 
 Open preferences by typing "preferences", or using `Option + Command + comma`.
 Preferences will be opened in an external text editor as an `.ini` file. 
-Changes will take affect once you run RoboLauncher again
+Changes will take affect once you run Robocast again
 
 -   ### Scripts/Extensions
 
@@ -39,7 +39,7 @@ Changes will take affect once you run RoboLauncher again
 -   ### Text Editor
 
     You can either use your prefered external text editor or the RoboFont default
-    when opening python scripts from within RoboLauncher.
+    when opening python scripts from within Robocast.
     values can be either `robofont` or `external`. This settings is *not* case-senstive.
 
 -   ### Search Near Open Fonts for Scripts
