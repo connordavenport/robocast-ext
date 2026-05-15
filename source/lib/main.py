@@ -1,18 +1,17 @@
 # shortCut  : command + \
-# menuTitle : RoboLauncher
+# menuTitle : Robocast
 
 import os
 import vanilla
 import plistlib
 import configparser
-from AppKit import NSScreen, NSColor, NSNoBorder
+from AppKit import NSScreen, NSColor
 import AppKit
-from mojo.UI import StatusInteractivePopUpWindow, GetFolder, OpenScriptWindow, getDefault
+from mojo.UI import StatusInteractivePopUpWindow, OpenScriptWindow, getDefault
 import subprocess
-from pprint import pprint
 
 from lib.UI import preferences
-from AppKit import NSApp, NSEventModifierFlagCommand, NSEventModifierFlagShift, NSEventModifierFlagOption, NSEventModifierFlagControl
+from AppKit import NSEventModifierFlagCommand, NSEventModifierFlagShift, NSEventModifierFlagOption, NSEventModifierFlagControl
 
 
 
@@ -39,7 +38,7 @@ MODIFIER_SYMBOLS = {
 "command": "⌘",
 }
 
-class RoboLauncher(object):
+class Robocast(object):
     def __init__(self):
 
         ## Preference Files
@@ -499,4 +498,4 @@ class RoboLauncher(object):
 
 
 if __name__ == "__main__":
-    RoboLauncher()
+    Robocast()
